@@ -1,64 +1,10 @@
 require 'trusted_keys/version'
 require 'rails'
 require 'trusted_keys/trustable'
+require 'trusted_keys/error/usage'
 
 module TrustedKeys
   extend ActiveSupport::Concern
-
-  class UsageError < StandardError
-    def initialize(params)
-      @params = params
-    end
-
-    def message
-      "\n\nparams => #{@params.inspect}\n\n" +
-      "Error: Before using `trusted_attributes` you must set the " +
-      "trusted keys in the controller, for examples: `trust :post` " +
-      "or `trust :title, :body, for: 'post'`"
-    end
-  end
-
-  class NotTrustedError < StandardError
-    def initialize
-      @keys = {}
-    end
-
-    def message
-      usage = @keys.map do |scope, keys|
-        "`trust #{keys}, for: '#{scope}'`"
-      end.join("\n")
-
-      "\n\nError: There are keys in the params hash that are not trusted. " +
-      "Set them as trusted with:\n#{usage} at the top of the controller."
-    end
-
-    def keys(options)
-      scope = options.fetch(:scope)
-      key = options.fetch(:key)
-      keys = options.fetch(:keys).flatten.map do |key|
-        ":#{key.sub(/\(\di\)/, '')}"
-      end.uniq.join(', ')
-
-      scope_key = (scope + [key]).compact.join('.')
-      @keys[scope_key] = keys unless scope_key.empty?
-
-      self
-    end
-
-    def present?
-      if production?
-        false
-      else
-        not @keys.empty?
-      end
-    end
-
-    private
-
-    def production?
-      not(Rails.env.development? or Rails.env.test?)
-    end
-  end
 
   module ClassMethods
     def trust(*args)
@@ -78,7 +24,7 @@ module TrustedKeys
 
   def trusted_attributes
     trusted_keys = self.class.instance_variable_get("@_trusted_keys")
-    raise UsageError.new(params) unless trusted_keys
+    raise Error::Usage.new(params) unless trusted_keys
 
     sorted_keys = trusted_keys.sort
 

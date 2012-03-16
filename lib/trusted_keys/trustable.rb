@@ -1,3 +1,5 @@
+require 'trusted_keys/error/not_trusted'
+
 module TrustedKeys
   module Trustable
     extend ActiveSupport::Concern
@@ -17,9 +19,9 @@ module TrustedKeys
       keys = params.keys(&:to_s) - result.keys.map(&:to_s)
 
       unless keys.empty?
-        not_trusted =  NotTrustedError.new.keys(:scope => @scope,
-                                                :key => nil,
-                                                :keys => keys)
+        not_trusted =  Error::NotTrusted.new.keys(:scope => @scope,
+                                                  :key => nil,
+                                                  :keys => keys)
 
         raise not_trusted if not_trusted.present?
       end
@@ -28,7 +30,7 @@ module TrustedKeys
     end
 
     def on_scope(attributes)
-      @scope.slice(1, @scope.size - 2).inject(attributes) do |attributes, key|
+      @scope.slice(1, @scope.size - 2).reduce(attributes) do |attributes, key|
         attributes[key]
       end
     end
@@ -44,7 +46,7 @@ module TrustedKeys
         trusted.level == (level + 1)
       end.map { |trusted| trusted.key.to_s }
 
-      not_trusted =  NotTrustedError.new
+      not_trusted =  Error::NotTrusted.new
 
       attributes.each do |key, value|
         if value.is_a?(Hash) and !trusted_keys.include?(key.to_s)

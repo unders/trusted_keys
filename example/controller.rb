@@ -113,7 +113,8 @@ class ApplicationController5
 end
 ApplicationController5.new.puts
 # =>
-# { "title"=>"", "start(1i)"=>"2012", "start(2i)"=>"3", "start(3i)"=>"5", "description"=>"", "attendees"=>"",
+# { "title"=>"", "start(1i)"=>"2012", "start(2i)"=>"3", "start(3i)"=>"5",
+#   "description"=>"", "attendees"=>"",
 #   "slug_attributes"=>{"slug"=>"dddd"},
 #   "comment_attributes"=>{ "body"=>"I am body",
 #                           "slug3_attributes"=>{"slug3"=>"is cool"}}}
