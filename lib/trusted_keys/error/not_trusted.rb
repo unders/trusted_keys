@@ -35,8 +35,6 @@ module TrustedKeys
         end
       end
 
-      private
-
       def production?
         not(Rails.env.development? or Rails.env.test?)
       end
