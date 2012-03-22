@@ -1,8 +1,9 @@
 module TrustedKeys
   module Error
     class NotTrusted < StandardError
-      def initialize
+      def initialize(env)
         @keys = {}
+        @production = not(env.development? or env.test?)
       end
 
       def message
@@ -18,7 +19,7 @@ module TrustedKeys
         scope = options.fetch(:scope)
         key = options.fetch(:key)
         keys = options.fetch(:keys).flatten.map do |key|
-          ":#{key.sub(/\(\di\)/, '')}"
+          ":#{key.to_s.sub(/\(\di\)/, '')}"
         end.uniq.join(', ')
 
         scope_key = (scope + [key]).compact.join('.')
@@ -28,15 +29,11 @@ module TrustedKeys
       end
 
       def present?
-        if production?
+        if @production
           false
         else
           not @keys.empty?
         end
-      end
-
-      def production?
-        not(Rails.env.development? or Rails.env.test?)
       end
     end
   end

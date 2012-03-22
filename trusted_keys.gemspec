@@ -8,7 +8,9 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{Mass assignment security in your controller}
   gem.homepage      = ""
 
-  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  gem.executables   = `git ls-files -- bin/*`.split("\n").map do |f|
+                        File.basename(f)
+                      end
   gem.files         = `git ls-files`.split("\n")
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.name          = "trusted_keys"
@@ -16,4 +18,8 @@ Gem::Specification.new do |gem|
   gem.version       = TrustedKeys::VERSION
 
   gem.add_runtime_dependency "rails", ["~> 3.0"]
+  gem.add_development_dependency "minitest", ["~> 2.11"]
+  gem.add_development_dependency "guard", ["~> 1.0"]
+  gem.add_development_dependency "guard-minitest", ["~> 0.5"]
+  gem.add_development_dependency "minitest-colorize", ["~> 0.0.4"]
 end
