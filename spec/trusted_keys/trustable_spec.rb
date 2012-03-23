@@ -22,6 +22,7 @@ describe TrustedKeys::Trustable do
       :controller => "events",
       :events => {
         :nested_attributes => { "0" => {  "_destroy"=>"false",
+                                          "dangerous" => "remove me",
                                           "start"=>"2012" },
                                 "new_1331711737056" => {  "_destroy"=>"false",
                                                           "start"=>"2012" } } },
@@ -41,41 +42,18 @@ describe TrustedKeys::Trustable do
     }.merge(options_hash)
   end
 
-  describe "#on_scope" do
-    context "level 2" do
-      it "returns the hash for that level" do
-        t = klass.new(options(:scope => [:post, :comments],
-                              :trusted_keys => [],
-                              :keys => [:body]))
-        t.on_scope(params[:post]).must_equal(params[:post])
-      end
-    end
+  describe "nested attributes" do
+    it "returns nested hash" do
+      post = klass.new(options(:scope => [:events, :nested_attributes],
+                               :trusted_keys => [],
+                               :nested => true,
+                               :keys => [ "start", "_destroy" ]))
 
-    context "level 3" do
-      it "returns the hash for that level" do
-        t = klass.new(options(:scope => [:post, :comments, :author],
-                              :trusted_keys => [],
-                              :keys => [:name]))
-        t.on_scope(params[:post]).must_equal(params[:post][:comments])
-      end
-    end
-
-    context "level 1" do
-      it "not applicable" do
-        t = klass.new(options(:scope => [:post],
-                              :trusted_keys => [],
-                              :keys => [:body]))
-        proc { t.on_scope(params) }.must_raise NoMethodError
-      end
-    end
-
-    context "level 0" do
-      it "not applicable" do
-        t = klass.new(options(:scope => [],
-                              :trusted_keys => [],
-                              :keys => [:body]))
-        proc { t.on_scope(params) }.must_raise NoMethodError
-      end
+      expected = { "0" => {  "_destroy"=>"false",
+                             "start"=>"2012" },
+                   "new_1331711737056" => {  "_destroy"=>"false",
+                                             "start"=>"2012" } }
+      post.attributes(params).must_equal(expected)
     end
   end
 
@@ -172,6 +150,44 @@ describe TrustedKeys::Trustable do
                                  :trusted_keys => [],
                                  :keys => [:body]))
         post.attributes(params).must_equal("body" => 'My body')
+      end
+    end
+  end
+
+  describe "#on_scope" do
+    context "level 2" do
+      it "returns the hash for that level" do
+        t = klass.new(options(:scope => [:post, :comments],
+                              :trusted_keys => [],
+                              :keys => [:body]))
+        t.on_scope(params[:post]).must_equal(params[:post])
+      end
+    end
+
+    context "level 3" do
+      it "returns the hash for that level" do
+        t = klass.new(options(:scope => [:post, :comments, :author],
+                              :trusted_keys => [],
+                              :keys => [:name]))
+        t.on_scope(params[:post]).must_equal(params[:post][:comments])
+      end
+    end
+
+    context "level 1" do
+      it "not applicable" do
+        t = klass.new(options(:scope => [:post],
+                              :trusted_keys => [],
+                              :keys => [:body]))
+        proc { t.on_scope(params) }.must_raise NoMethodError
+      end
+    end
+
+    context "level 0" do
+      it "not applicable" do
+        t = klass.new(options(:scope => [],
+                              :trusted_keys => [],
+                              :keys => [:body]))
+        proc { t.on_scope(params) }.must_raise NoMethodError
       end
     end
   end

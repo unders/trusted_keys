@@ -9,6 +9,7 @@ module TrustedKeys
       @scope = options.fetch(:scope)
       @trusted_keys = options.fetch(:trusted_keys)
       @untrusted = options.fetch(:untrusted)
+      @nested = options[:nested] || false
 
       self.class.send("attr_accessible", *options.fetch(:keys))
     end
@@ -18,18 +19,15 @@ module TrustedKeys
         params[key.to_sym] || params[key.to_s]
       end
 
-      result = sanitize_for_mass_assignment(params)
-
-      keys = params.keys.map(&:to_s) - result.keys.map(&:to_s)
-
-      unless keys.empty?
-        untrusted = @untrusted.keys(:scope => @scope,
-                                    :key => nil,
-                                    :keys => keys)
-        raise untrusted if untrusted.present?
+      if @nested
+        {}.tap do |hash|
+          params.each do |key, nested_hash|
+            hash[key] = sanitize(nested_hash)
+          end
+        end
+      else
+        sanitize(params)
       end
-
-      remove_untrusted_keys(result)
     end
 
     def on_scope(attributes)
@@ -43,6 +41,21 @@ module TrustedKeys
     def level; @scope.size; end
 
     private
+
+    def sanitize(params)
+      result = sanitize_for_mass_assignment(params)
+
+      keys = params.keys.map(&:to_s) - result.keys.map(&:to_s)
+
+      unless keys.empty?
+        untrusted = @untrusted.keys(:scope => @scope,
+                                    :key => nil,
+                                    :keys => keys)
+        raise untrusted if untrusted.present?
+      end
+
+      remove_untrusted_keys(result)
+    end
 
     def remove_untrusted_keys(attributes)
       trusted_keys = @trusted_keys.select do |trusted|
