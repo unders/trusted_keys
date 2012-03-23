@@ -1,14 +1,9 @@
 require 'minitest_helper'
 
-Klass = Class.new do
-  include TrustedKeys::Trustable
-end
-
 NotTrusted = TrustedKeys::Error::NotTrusted
 Usage = TrustedKeys::Error::Usage
 
 describe TrustedKeys::Trustable do
-  let(:production) { OpenStruct.new(:test? => false, :development? => false) }
   let(:test) { OpenStruct.new(:test? => true, :development? => false) }
 
   let(:klass) do
@@ -37,7 +32,8 @@ describe TrustedKeys::Trustable do
   def options(options_hash)
     { :scope => [],
       :trusted_keys => [],
-      :untrusted => NotTrusted.new(production),
+      :untrusted => NotTrusted.new(OpenStruct.new(:test? => false,
+                                                  :development? => false)),
       :keys => [:email]
     }.merge(options_hash)
   end
@@ -195,19 +191,19 @@ describe TrustedKeys::Trustable do
   describe "#key" do
     context "scope is empty" do
       it "returns nil" do
-        Klass.new(options(:scope => [])).key.must_equal nil
+        klass.new(options(:scope => [])).key.must_equal nil
       end
     end
 
     context "scope has 1 key" do
       it "returns the key" do
-        Klass.new(options(:scope => [:post])).key.must_equal :post
+        klass.new(options(:scope => [:post])).key.must_equal :post
       end
     end
 
     context "scope has 2 keys" do
       it "returns the last key - deepest key" do
-        Klass.new(options(:scope => [:post, :comment])).key.must_equal :comment
+        klass.new(options(:scope => [:post, :comment])).key.must_equal :comment
       end
     end
   end
@@ -215,19 +211,19 @@ describe TrustedKeys::Trustable do
   describe "#level" do
     context "scope is empty" do
       it "returns 0" do
-        Klass.new(options(:scope => [])).level.must_equal 0
+        klass.new(options(:scope => [])).level.must_equal 0
       end
     end
 
     context "scope has 1 key" do
       it "returns 1" do
-        Klass.new(options(:scope =>[:post])).level.must_equal 1
+        klass.new(options(:scope =>[:post])).level.must_equal 1
       end
     end
 
     context "scope has 2 keys" do
       it "returns 2" do
-        Klass.new(options(:scope => [:post, :comment])).level.must_equal 2
+        klass.new(options(:scope => [:post, :comment])).level.must_equal 2
       end
     end
   end
@@ -235,8 +231,8 @@ describe TrustedKeys::Trustable do
   describe "#<=>" do
     describe "sort an array" do
       before do
-        @a1 = Klass.new(options(:scope =>[:post, :comment]))
-        @a2 = Klass.new(options(:scope => [:post]))
+        @a1 = klass.new(options(:scope =>[:post, :comment]))
+        @a2 = klass.new(options(:scope => [:post]))
         @array = [@a1, @a2]
         @array.first.must_equal @a1
       end
