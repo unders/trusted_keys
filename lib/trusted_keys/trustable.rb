@@ -14,7 +14,10 @@ module TrustedKeys
     end
 
     def attributes(params)
-      params = @scope.inject(params) { |params, key| params[key] }
+      params = @scope.inject(params) do |params, key|
+        params[key.to_sym] || params[key.to_s]
+      end
+
       result = sanitize_for_mass_assignment(params)
 
       keys = params.keys.map(&:to_s) - result.keys.map(&:to_s)
@@ -39,11 +42,11 @@ module TrustedKeys
     def <=> (other); level <=> other.level; end
     def level; @scope.size; end
 
-   private
+    private
 
-   def env
-     self.class.env
-   end
+    def env
+      self.class.env
+    end
 
     def remove_untrusted_keys(attributes)
       trusted_keys = @trusted_keys.select do |trusted|

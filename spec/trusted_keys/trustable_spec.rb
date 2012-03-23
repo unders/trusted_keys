@@ -31,6 +31,11 @@ describe TrustedKeys::Trustable do
   let(:params) do
     { "email" => "anders@email.com",
       :controller => "events",
+      :events => {
+        :nested_attributes => { "0" => {  "_destroy"=>"false",
+                                          "start"=>"2012" },
+                                "new_1331711737056" => {  "_destroy"=>"false",
+                                                          "start"=>"2012" } } },
       :password => "secret",
       :post =>  {  :body => "I am a body",
                    :title => "This is my title",

@@ -8,11 +8,15 @@ module TrustedKeys
 
   module ClassMethods
     def trust(*args)
-      scope = args.extract_options!.fetch(:for, "").to_s.split '.'
+      options = args.extract_options!
+      scope = options.fetch(:for, "").to_s.split '.'
+      environment = options[:env] || Rails.env
 
       klass = Class.new do
         include Trustable
         send("attr_accessible", *args)
+
+        define_method(:env) { environment }
       end
 
       @_trusted_keys ||= []
