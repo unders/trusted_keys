@@ -40,28 +40,28 @@ describe TrustedKeys::Trustable do
   end
 
   describe "#on_scope" do
-    context "#level 2" do
+    context "level 2" do
       it "returns the hash for that level" do
         t = trustableClass.new([:post, :comments], [], :body)
         t.on_scope(params[:post]).must_equal(params[:post])
       end
     end
 
-    context "#level 3" do
+    context "level 3" do
       it "returns the hash for that level" do
         t = trustableClass.new([:post, :comments, :author], [], :name)
         t.on_scope(params[:post]).must_equal(params[:post][:comments])
       end
     end
 
-    context "#level 1" do
+    context "level 1" do
       it "not applicable" do
         t = trustableClass.new([:post], [], :body)
         proc { t.on_scope(params) }.must_raise NoMethodError
       end
     end
 
-    context "#level 0" do
+    context "level 0" do
       it "not applicable" do
         t = trustableClass.new([], [], :body)
         proc { t.on_scope(params) }.must_raise NoMethodError
@@ -70,7 +70,6 @@ describe TrustedKeys::Trustable do
   end
 
   describe "#attributes" do
-
     describe "when in test or development environment" do
       context "level 0" do
         it "doesn't raise an exception if all params isn't trusted" do
