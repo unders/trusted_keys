@@ -9,9 +9,15 @@ module TrustedKeys
       @scope = options.fetch(:scope)
       @trusted_keys = options.fetch(:trusted_keys)
       @untrusted = options.fetch(:untrusted)
-      @nested = options[:nested] || false
+      @nested = options.fetch(:nested, true)
+      keys = options.fetch(:keys)
 
-      self.class.send("attr_accessible", *options.fetch(:keys))
+      if nested?
+        keys << "_destroy"
+        keys << "id"
+      end
+
+      self.class.send("attr_accessible", *keys)
     end
 
     def attributes(params)
@@ -19,7 +25,7 @@ module TrustedKeys
         params[key.to_sym] || params[key.to_s]
       end
 
-      if @nested
+      if nested?
         {}.tap do |hash|
           params.each do |key, nested_hash|
             hash[key] = sanitize(nested_hash)
@@ -41,6 +47,10 @@ module TrustedKeys
     def level; @scope.size; end
 
     private
+
+    def nested?
+      @nested and key.to_s[/\A.+_attributes\Z/]
+    end
 
     def sanitize(params)
       result = sanitize_for_mass_assignment(params)

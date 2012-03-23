@@ -12,18 +12,17 @@ module TrustedKeys
       options = args.extract_options!
       scope = options.fetch(:for, "").to_s.split '.'
       env = options[:env] || Rails.env
+      nested = options.fetch(:nested, true)
 
       klass = Class.new do
         include Trustable
-        send("attr_accessible", *args)
-
-        #define_method(:env) { environment }
       end
 
       @_trusted_keys ||= []
       @_trusted_keys << klass.new(:scope => scope,
                                   :trusted_keys => @_trusted_keys,
                                   :untrusted => Error::NotTrusted.new(env),
+                                  :nested => nested,
                                   :keys => args)
     end
   end

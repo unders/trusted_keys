@@ -15,6 +15,9 @@ describe TrustedKeys::Trustable do
   let(:params) do
     { "email" => "anders@email.com",
       :controller => "events",
+      :time => { "start_time(1i)"=>"2012",
+                 "start_time(2i)"=>"3",
+                 "start_time(3i)"=>"14" },
       :events => {
         :nested_attributes => { "0" => {  "_destroy"=>"false",
                                           "dangerous" => "remove me",
@@ -38,12 +41,24 @@ describe TrustedKeys::Trustable do
     }.merge(options_hash)
   end
 
+  describe "datetime selects" do
+    it "return all datetime attributes" do
+      t = klass.new(options(:scope => [:time],
+                               :trusted_keys => [],
+                               :keys => [:start_time]))
+
+      expected = {  "start_time(1i)"=>"2012",
+                    "start_time(2i)"=>"3",
+                    "start_time(3i)"=>"14" }
+      t.attributes(params).must_equal(expected)
+    end
+  end
+
   describe "nested attributes" do
     it "returns nested hash" do
       post = klass.new(options(:scope => [:events, :nested_attributes],
                                :trusted_keys => [],
-                               :nested => true,
-                               :keys => [ "start", "_destroy" ]))
+                               :keys => [ "start" ]))
 
       expected = { "0" => {  "_destroy"=>"false",
                              "start"=>"2012" },

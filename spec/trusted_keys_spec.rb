@@ -7,10 +7,15 @@ describe TrustedKeys do
 
       def params
         { "email" => "anders@email.com",
-          :nested_attributes => { "0" => {  "_destroy"=>"false",
-                                            "start"=>"2012" },
-                                  "new_1331711737056" => {  "_destroy"=>"false",
-                                                            "start"=>"2012" } },
+          :time => { "start_time(1i)"=>"2012",
+                     "start_time(2i)"=>"3",
+                     "start_time(3i)"=>"14" },
+          :event => {
+            :nested_attributes => {
+              "0" => {  "_destroy"=>"false",
+                        "start"=>"2012" },
+              "new_1331711737056" => {  "_destroy"=>"false",
+                                        "start"=>"2012" } } },
           :controller => "events",
           :password => "secret",
           :post =>  {  :body => "I am a body",
@@ -25,6 +30,34 @@ describe TrustedKeys do
   let(:env) { OpenStruct.new(:test? => false, :development? => false) }
 
   describe ".trust" do
+    describe "datetime selects" do
+      it "return all datetime attributes" do
+        controller.trust :start_time, :for => :time, :env => env
+        trusted_attributes = controller.new.send(:trusted_attributes)
+
+        expected = {  "start_time(1i)"=>"2012",
+                      "start_time(2i)"=>"3",
+                      "start_time(3i)"=>"14" }
+        trusted_attributes.must_equal(expected)
+      end
+    end
+
+    context "nested attributes" do
+      it "returns nested hash" do
+        controller.trust :nested_attributes, :for => :event, :env => env
+        controller.trust "start", :for => 'event.nested_attributes', :env => env
+
+        trusted_attributes = controller.new.send(:trusted_attributes)
+
+        expected = { "nested_attributes" => {
+                        "0" =>  {  "_destroy"=>"false",
+                                   "start"=>"2012" },
+                        "new_1331711737056" => {  "_destroy"=>"false",
+                                                  "start"=>"2012" } } }
+        trusted_attributes.must_equal(expected)
+      end
+    end
+
     context "no trusted keys" do
       it "raises an exception" do
         proc {
