@@ -1,4 +1,3 @@
-require 'trusted_keys/error/not_trusted'
 require 'active_support/core_ext/hash/indifferent_access'
 
 module TrustedKeys
@@ -6,11 +5,12 @@ module TrustedKeys
     extend ActiveSupport::Concern
     include ActiveModel::MassAssignmentSecurity
 
-    def initialize(scope, trusted_keys, *keys)
-      @scope = scope
-      @trusted_keys = trusted_keys
+    def initialize(options)
+      @scope = options.fetch(:scope)
+      @trusted_keys = options.fetch(:trusted_keys)
+      @untrusted = options.fetch(:untrusted)
 
-      self.class.send("attr_accessible", *keys)
+      self.class.send("attr_accessible", *options.fetch(:keys))
     end
 
     def attributes(params)
@@ -23,9 +23,9 @@ module TrustedKeys
       keys = params.keys.map(&:to_s) - result.keys.map(&:to_s)
 
       unless keys.empty?
-        untrusted =  Error::NotTrusted.new(env).keys(:scope => @scope,
-                                                     :key => nil,
-                                                     :keys => keys)
+        untrusted = @untrusted.keys(:scope => @scope,
+                                    :key => nil,
+                                    :keys => keys)
         raise untrusted if untrusted.present?
       end
 
@@ -44,25 +44,19 @@ module TrustedKeys
 
     private
 
-    def env
-      self.class.env
-    end
-
     def remove_untrusted_keys(attributes)
       trusted_keys = @trusted_keys.select do |trusted|
         trusted.level == (level + 1)
       end.map { |trusted| trusted.key.to_s }
 
-      untrusted =  Error::NotTrusted.new(env)
-
       attributes.each do |key, value|
         if value.is_a?(Hash) and !trusted_keys.include?(key.to_s)
           attributes[key] = ""
-          untrusted.keys :scope => @scope, :key => key, :keys => value.keys
+          @untrusted.keys :scope => @scope, :key => key, :keys => value.keys
         end
       end
 
-      raise untrusted if untrusted.present?
+      raise @untrusted if @untrusted.present?
 
       HashWithIndifferentAccess.new(attributes)
     end

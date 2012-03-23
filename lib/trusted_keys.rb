@@ -2,6 +2,7 @@ require 'trusted_keys/version'
 require 'rails'
 require 'trusted_keys/trustable'
 require 'trusted_keys/error/usage'
+require 'trusted_keys/error/not_trusted'
 
 module TrustedKeys
   extend ActiveSupport::Concern
@@ -10,17 +11,20 @@ module TrustedKeys
     def trust(*args)
       options = args.extract_options!
       scope = options.fetch(:for, "").to_s.split '.'
-      environment = options[:env] || Rails.env
+      env = options[:env] || Rails.env
 
       klass = Class.new do
         include Trustable
         send("attr_accessible", *args)
 
-        define_method(:env) { environment }
+        #define_method(:env) { environment }
       end
 
       @_trusted_keys ||= []
-      @_trusted_keys << klass.new(scope, @_trusted_keys, *args)
+      @_trusted_keys << klass.new(:scope => scope,
+                                  :trusted_keys => @_trusted_keys,
+                                  :untrusted => Error::NotTrusted.new(env),
+                                  :keys => args)
     end
   end
 
