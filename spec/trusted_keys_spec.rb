@@ -16,6 +16,22 @@ describe TrustedKeys do
                         "start"=>"2012" },
               "new_1331711737056" => {  "_destroy"=>"false",
                                         "start"=>"2012" } } },
+          "survey"=> {
+            "name"=>"survery 1",
+            "questions_attributes"=>
+              { "0"=>{"_destroy"=>"1",
+                      "content"=>"question2",
+                      "dddd" => "xxxx",
+                      "id"  => "1",
+                      "answers_attributes"=>{
+                        "0"=>{"content"=>"answer1","_destroy"=>"","dd" => "x"},
+                        "1"=>{"content"=>"answer 2","_destroy"=>"1","id"=>"2"}
+                       }},
+                "1"=>{"_destroy"=>"1",
+                      "content"=>"",
+                      "answers_attributes"=>{
+                        "1"=>{"content"=>"", "_destroy"=>""}}}}},
+
           :controller => "events",
           :password => "secret",
           :post =>  {  :body => "I am a body",
@@ -43,6 +59,34 @@ describe TrustedKeys do
     end
 
     context "nested attributes" do
+      it "returns nested hash" do
+        controller.trust :questions_attributes, :name, :for => :survey,
+                                                       :env => env
+        controller.trust "answers_attributes", "content",
+                         :for => 'survey.questions_attributes', :env => env
+
+        controller.trust "content",
+          :for => 'survey.questions_attributes.answers_attributes', :env => env
+
+        trusted_attributes = controller.new.send(:trusted_attributes)
+
+        expected = {
+          "name"=>"survery 1",
+          "questions_attributes"=>
+            { "0"=>{"_destroy"=>"1",
+                    "content"=>"question2",
+                    "id"  => "1",
+                    "answers_attributes"=>{
+                    "0"=>{"content"=>"answer1", "_destroy"=>""},
+                    "1"=>{"content"=>"answer 2", "_destroy"=>"1", "id"=>"2"}}},
+            "1"=>{"_destroy"=>"1",
+                  "content"=>"",
+                  "answers_attributes"=>{
+                    "1"=>{"content"=>"", "_destroy"=>""}}}}}
+
+        trusted_attributes.must_equal(expected)
+      end
+
       it "returns nested hash" do
         controller.trust :nested_attributes, :for => :event, :env => env
         controller.trust "start", :for => 'event.nested_attributes', :env => env

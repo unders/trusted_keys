@@ -38,7 +38,15 @@ module TrustedKeys
     attributes = sorted_keys.first.attributes(params)
 
     sorted_keys.drop(1).each do |trusted|
-      trusted.on_scope(attributes)[trusted.key] = trusted.attributes(params)
+      current_attributes = trusted.on_scope(attributes)
+
+      if trusted.parent_nested?
+        current_attributes.each do |key, hash|
+          hash[trusted.key] = trusted.attributes(hash)
+        end
+      else
+        current_attributes[trusted.key] = trusted.attributes(current_attributes)
+      end
     end
 
     attributes

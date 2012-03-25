@@ -44,8 +44,8 @@ describe TrustedKeys::Trustable do
   describe "datetime selects" do
     it "return all datetime attributes" do
       t = klass.new(options(:scope => [:time],
-                               :trusted_keys => [],
-                               :keys => [:start_time]))
+                            :trusted_keys => [],
+                            :keys => [:start_time]))
 
       expected = {  "start_time(1i)"=>"2012",
                     "start_time(2i)"=>"3",
@@ -56,15 +56,15 @@ describe TrustedKeys::Trustable do
 
   describe "nested attributes" do
     it "returns nested hash" do
-      post = klass.new(options(:scope => [:events, :nested_attributes],
-                               :trusted_keys => [],
-                               :keys => [ "start" ]))
+      t = klass.new(options(:scope => [:events, :nested_attributes],
+                            :trusted_keys => [],
+                            :keys => [ "start" ]))
 
       expected = { "0" => {  "_destroy"=>"false",
                              "start"=>"2012" },
                    "new_1331711737056" => {  "_destroy"=>"false",
                                              "start"=>"2012" } }
-      post.attributes(params).must_equal(expected)
+      t.attributes(params[:events]).must_equal(expected)
     end
   end
 
@@ -96,7 +96,7 @@ describe TrustedKeys::Trustable do
                                 :trusted_keys => [],
                                 :untrusted => NotTrusted.new(test),
                                 :keys => [:body]))
-          proc { t.attributes(params) }.must_raise NotTrusted
+          proc { t.attributes(params[:post]) }.must_raise NotTrusted
         end
       end
 
@@ -148,19 +148,19 @@ describe TrustedKeys::Trustable do
 
     context "level 1" do
       it "returns trusted params for level 1" do
-        post = klass.new(options(:scope => [:post],
+        t = klass.new(options(:scope => [:post],
                                  :trusted_keys => [],
                                  :keys => [:body]))
-        post.attributes(params).must_equal("body" => 'I am a body')
+        t.attributes(params).must_equal("body" => 'I am a body')
       end
     end
 
     context "level 2" do
       it "returns trusted params for level 2" do
-        post = klass.new(options(:scope => [:post, :comments],
+        t = klass.new(options(:scope => [:post, :comments],
                                  :trusted_keys => [],
                                  :keys => [:body]))
-        post.attributes(params).must_equal("body" => 'My body')
+        t.attributes(params[:post]).must_equal("body" => 'My body')
       end
     end
   end

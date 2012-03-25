@@ -21,9 +21,7 @@ module TrustedKeys
     end
 
     def attributes(params)
-      params = @scope.inject(params) do |params, key|
-        params[key.to_sym] || params[key.to_s]
-      end
+      params = params[key.to_sym] || params[key.to_s] if key
 
       if nested?
         {}.tap do |hash|
@@ -46,11 +44,30 @@ module TrustedKeys
     def <=> (other); level <=> other.level; end
     def level; @scope.size; end
 
-    private
+    def parent_nested?
+      if level > 1
+        parent and parent.nested?
+      else
+        false
+      end
+    end
+
+    protected
 
     def nested?
       @nested and key.to_s[/\A.+_attributes\Z/]
     end
+
+    private
+
+    def parent
+      key = @scope.at(@scope.size - 2)
+
+      @trusted_keys.select do |trusted|
+        trusted.key.to_s == key and trusted.level == (level - 1)
+      end.first
+    end
+
 
     def sanitize(params)
       result = sanitize_for_mass_assignment(params)
