@@ -11,6 +11,11 @@ describe TrustedKeys do
                      "start_time(2i)"=>"3",
                      "start_time(3i)"=>"14" },
           :event => {
+            :password => "secret",
+            :collection_attributes => [ { "one" =>  "ok 1",
+                                          "two" => "remove me"},
+                                        { "one" => "ok 2",
+                                          "two" => "remove me 2"} ],
             :nested_attributes => {
               "0" => {  "_destroy"=>"false",
                         "start"=>"2012" },
@@ -54,6 +59,21 @@ describe TrustedKeys do
         expected = {  "start_time(1i)"=>"2012",
                       "start_time(2i)"=>"3",
                       "start_time(3i)"=>"14" }
+        trusted_attributes.must_equal(expected)
+      end
+    end
+
+    describe "hashes inside a collection" do
+      it "returns trusted attributes" do
+        controller.trust :collection_attributes, "password", :for => :event,
+                                                             :env => env
+        controller.trust :one, :for => 'event.collection_attributes',
+                               :env => env
+        trusted_attributes = controller.new.send(:trusted_attributes)
+
+        expected = { "password" => "secret",
+                     "collection_attributes" => [{ "one" => "ok 1" },
+                                                 { "one" => "ok 2" }] }
         trusted_attributes.must_equal(expected)
       end
     end

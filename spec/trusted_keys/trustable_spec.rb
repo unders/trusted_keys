@@ -15,6 +15,10 @@ describe TrustedKeys::Trustable do
   let(:params) do
     { "email" => "anders@email.com",
       :controller => "events",
+      :collection => [ { "one" =>  "ok 1",
+                         "two" => "remove me"},
+                       { "one" => "ok 2",
+                         "two" => "remove me 2"} ],
       :time => { "start_time(1i)"=>"2012",
                  "start_time(2i)"=>"3",
                  "start_time(3i)"=>"14" },
@@ -39,6 +43,16 @@ describe TrustedKeys::Trustable do
                                                   :development? => false)),
       :keys => [:email]
     }.merge(options_hash)
+  end
+
+  describe "attributes inside a collection" do
+    it "returns trusted attributes" do
+      t = klass.new(options(:scope => [:collection],
+                           :keys => ["one"]))
+      expected = [{ "one" => "ok 1" }, { "one" => "ok 2" }]
+
+      t.attributes(params).must_equal(expected)
+    end
   end
 
   describe "datetime selects" do

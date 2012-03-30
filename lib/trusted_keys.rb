@@ -40,7 +40,7 @@ module TrustedKeys
     sorted_keys.drop(1).each do |trusted|
       current_attributes = trusted.on_scope(attributes)
 
-      if trusted.parent_nested?
+      if trusted.parent_nested?(current_attributes)
         current_attributes.each do |key, hash|
           hash[trusted.key] = trusted.attributes(hash)
         end

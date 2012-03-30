@@ -12,7 +12,7 @@ module TrustedKeys
       @nested = options.fetch(:nested, true)
       keys = options.fetch(:keys)
 
-      if nested?
+      if nested?({})
         keys << "_destroy"
         keys << "id"
       end
@@ -23,10 +23,16 @@ module TrustedKeys
     def attributes(params)
       params = params[key.to_sym] || params[key.to_s] if key
 
-      if nested?
+      if nested?(params)
         {}.tap do |hash|
           params.each do |key, nested_hash|
             hash[key] = sanitize(nested_hash)
+          end
+        end
+      elsif params.is_a?(Array)
+        [].tap do |array|
+          params.each do |hash|
+            array << sanitize(hash)
           end
         end
       else
@@ -44,9 +50,9 @@ module TrustedKeys
     def <=> (other); level <=> other.level; end
     def level; @scope.size; end
 
-    def parent_nested?
+    def parent_nested?(params)
       if level > 1
-        parent and parent.nested?
+        parent and parent.nested?(params)
       else
         false
       end
@@ -54,8 +60,12 @@ module TrustedKeys
 
     protected
 
-    def nested?
-      @nested and key.to_s[/\A.+_attributes\Z/]
+    def nested?(params)
+      if params.is_a?(Hash)
+        @nested and key.to_s[/\A.+_attributes\Z/]
+      else
+        false
+      end
     end
 
     private
