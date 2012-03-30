@@ -91,7 +91,7 @@ When the hash conforms to the `accepts_nested_attributes_for` structure, the key
 ## Environments
 
 When an attributes isn't trusted in __development__ or __test__ mode an exception is raised with a message
-explaning what to do. When other environments (e.g production) the attributes are silently removed.
+explaning what to do. When other environments (e.g __production__) the attributes are silently removed.
 
 
 ## Installation
