@@ -13,6 +13,10 @@ for more info.
  * see [spec](https://github.com/unders/trusted_keys/blob/master/spec/trusted_keys_spec.rb)
 
 ## Usage
+Add to Gemfile:
+
+
+
 Include it in your application controller:
 
 ``` ruby
@@ -22,6 +26,7 @@ end
 ```
 
 Define which attributes to trust in the controller:
+
 
 ``` ruby
 class EventsController < ApplicationController
