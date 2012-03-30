@@ -90,8 +90,8 @@ When the hash conforms to the `accepts_nested_attributes_for` structure, the key
 
 ## Environments
 
-When an attributes isn't trusted in development or teest mode an exception is raised 
-describing what to do. When other environment (e.g production) the attributes is silently removed.
+When an attributes isn't trusted in __development__ or __test__ mode an exception is raised with a message
+explaning what to do. When other environments (e.g production) the attributes is silently removed.
 
 
 ## Installation
