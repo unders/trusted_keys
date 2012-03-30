@@ -15,7 +15,9 @@ for more info.
 ## Usage
 Add to Gemfile:
 
-
+``` ruby
+gem 'trusted_keys'
+```
 
 Include it in your application controller:
 
