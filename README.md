@@ -7,7 +7,7 @@ It adds two methods:
  * `.trust` - defines the trusted attributes.
 
 ## Why
- * It handles forms that submits complex form defined by `accepts_nested_attributes_for`, even if 
+ * It handles complex hashes. E.g. handles hashes that complies to `accepts_nested_attributes_for`, even when 
 nested on several levels. See [spec](https://github.com/unders/trusted_keys/blob/master/spec/trusted_keys_spec.rb#L81) for more info.
 
 ## Usage
