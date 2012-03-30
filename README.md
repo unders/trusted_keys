@@ -10,7 +10,6 @@ It adds two methods:
  * It handles complex hashes. E.g. handles hashes that complies to `accepts_nested_attributes_for`, even when 
 nested on several levels, see [spec](https://github.com/unders/trusted_keys/blob/master/spec/trusted_keys_spec.rb#L81) 
 for more info.
- * see [spec](https://github.com/unders/trusted_keys/blob/master/spec/trusted_keys_spec.rb)
 
 ## Usage
 Include it in your application controller:
