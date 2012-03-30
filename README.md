@@ -1,6 +1,16 @@
 # TrustedKeys
 
-TODO: Write a gem description
+This gem makes it possible to handlle __mass assignment__ in the controller.  
+It adds two methods:
+  
+ * `trusted_attributes` - returns the trusted attributes.
+ * `trust` - defines the trusted attributes.
+
+## Example
+
+
+This module adds the private instance method: `trusted_attributes` to the controller, which only returns 
+trusted attributes specified in the controller by the class controller method: `trust`. 
 
 ## Installation
 
