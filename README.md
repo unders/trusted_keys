@@ -13,12 +13,6 @@ for more info.
  * see [spec](https://github.com/unders/trusted_keys/blob/master/spec/trusted_keys_spec.rb)
 
 ## Usage
-Add to Gemfile:
-
-``` ruby
-gem 'trusted_keys'
-```
-
 Include it in your application controller:
 
 ``` ruby
@@ -41,8 +35,16 @@ The above commands reads like this: _trust the following attributes: 'title', ..
 returned by the params[:event] hash_. 
 
 
+Inside your action:
 
+``` ruby
+def create
+  @event = Event.create(trusted_attributes)                             
+  respond_with(@event)                  
+end
+``` 
 
+And it will only return the trusted attributes.
 
 ## Installation
 
