@@ -3,14 +3,33 @@
 This gem makes it possible to handlle __mass assignment__ in the controller.  
 It adds two methods:
   
- * `trusted_attributes` - returns the trusted attributes.
- * `trust` - defines the trusted attributes.
+ * `#trusted_attributes` - returns the trusted attributes.
+ * `.trust` - defines the trusted attributes.
 
 ## Example
+Include it in your application controller:
+
+``` ruby
+class ApplicationController < ActionController::Base
+  include TrustedKeys
+end
+```
+
+Define which attributes to trust in the controller:
+
+``` ruby
+class EventsController < ApplicationController
+  trust :title, :location, :start, :stop, :description, :attendees, :repeat,
+        :min_number_of_attendees, :deadline, for: :event
+end
+```
+
+The above commands reads like this: _trust the following attributes: 'title', ..., 'deadline', 
+returned by the params[:event] hash_. 
 
 
-This module adds the private instance method: `trusted_attributes` to the controller, which only returns 
-trusted attributes specified in the controller by the class controller method: `trust`. 
+
+
 
 ## Installation
 
