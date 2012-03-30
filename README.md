@@ -46,7 +46,7 @@ end
 And it will only return the trusted attributes.
 
 
-A nested attributes example:
+### A nested attributes example:
 
 ``` ruby
 params = { "event" => 
