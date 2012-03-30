@@ -51,7 +51,6 @@ And it will only return the trusted attributes.
 ``` ruby
 params = { "event" => 
            { "title" => "A title",
-             "location" => "Gothenburg",
              "attendees_attributes" => {
                 "0" => {  "_destroy"=>"false",
                           "id" => "2",
@@ -74,7 +73,6 @@ end
 
 # trusted_attributes => 
   { "title" => "A title",
-    "location" => "Gothenburg",
     "attendees_attributes" => {
       "0" => {  "_destroy"=>"false",
                 "id" => "2",
