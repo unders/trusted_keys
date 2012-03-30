@@ -87,6 +87,13 @@ end
 When the hash conforms to the `accepts_nested_attributes_for` structure, the keys:
 '_destroy' and 'id' is also trusted on that hash level as the above example shows. 
 
+
+## Environments
+
+When an attributes isn't trusted in development or teest mode an exception is raised 
+describing what to do. When other environment (e.g production) the attributes is silently removed.
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
