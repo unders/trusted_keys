@@ -51,6 +51,7 @@ And it will only return the trusted attributes.
 ``` ruby
 params = { "event" => 
            { "title" => "A title",
+             "location" => "I am not trusted"
              "attendees_attributes" => {
                 "0" => {  "_destroy"=>"false",
                           "id" => "2",
@@ -62,7 +63,7 @@ params = { "event" =>
          }
 
 class EventsController < ApplicationController
-  trust :title, :location, for: :event
+  trust :title, for: :event
   trust :start, for: "event.attendees_attributes"
   
   def create
