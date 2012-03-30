@@ -63,7 +63,7 @@ params = { "event" =>
          }
 
 class EventsController < ApplicationController
-  trust :title, for: :event
+  trust :title, :attendees_attributes, for: :event
   trust :start, for: "event.attendees_attributes"
   
   def create
