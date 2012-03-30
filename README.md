@@ -45,6 +45,47 @@ end
 
 And it will only return the trusted attributes.
 
+
+A nested attributes example:
+
+``` ruby
+params = { "event" => 
+           { "title" => "A title",
+             "location" => "Gothenburg",
+             "attendees_attributes" => {
+                "0" => {  "_destroy"=>"false",
+                          "id" => "2",
+                          "dangerous" => "I am evil",
+                          "start"=>"2012" },
+                "new_1331711737056" => {  "_destroy"=>"false",
+                                          "start"=>"2012" } }
+           }
+         }
+
+class EventsController < ApplicationController
+  trust :title, :location, for: :event
+  trust :start, for: "event.attendees_attributes"
+  
+  
+  def create
+    @event = Event.create(trusted_attributes)                             
+    respond_with(@event)   
+  end
+end
+
+# trusted_attributes => 
+  { "title" => "A title",
+    "location" => "Gothenburg",
+    "attendees_attributes" => {
+      "0" => {  "_destroy"=>"false",
+                "id" => "2",
+                "start"=>"2012" },
+      "new_1331711737056" => {  "_destroy"=>"false",
+                                "start"=>"2012" } 
+    }
+  }
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
