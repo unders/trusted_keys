@@ -66,7 +66,6 @@ class EventsController < ApplicationController
   trust :title, :location, for: :event
   trust :start, for: "event.attendees_attributes"
   
-  
   def create
     @event = Event.create(trusted_attributes)                             
     respond_with(@event)   
@@ -85,6 +84,9 @@ end
     }
   }
 ```
+
+When the hash conforms to the `accepts_nested_attributes_for` structure, the keys:
+'_destroy' and 'id' is also trusted on that hash level as the above example shows. 
 
 ## Installation
 
