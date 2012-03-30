@@ -6,7 +6,11 @@ It adds two methods:
  * `#trusted_attributes` - returns the trusted attributes.
  * `.trust` - defines the trusted attributes.
 
-## Example
+## Why
+ * It handles forms that submits complex form defined by `accepts_nested_attributes_for`, even if 
+nested on several levels. See [spec](https://github.com/unders/trusted_keys/blob/master/spec/trusted_keys_spec.rb#L81) for more info.
+
+## Usage
 Include it in your application controller:
 
 ``` ruby
@@ -45,11 +49,8 @@ Or install it yourself as:
 
     $ gem install trusted_keys
 
-## Usage
 
-TODO: Write usage instructions here
-
-## Other mass assignment protection gems for in controller
+## Other mass assignment controller protection gems
 * https://github.com/topdan/param_accessible
 * https://github.com/ryanb/trusted-params
 * https://github.com/elabs/trusted_attributes
